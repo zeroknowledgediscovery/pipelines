@@ -1,5 +1,7 @@
 # Partial Qnet / LSM pipeline
-
+<p align="center">
+  <img src="logo.png" width="200">
+</p>
 ## Quick start
 
 Run this from inside `lsm_pipeline/`. Use a **unique model prefix** and **unique manifest name** for each survey/wave/model run.
