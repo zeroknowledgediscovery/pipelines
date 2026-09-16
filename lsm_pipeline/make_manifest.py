@@ -23,8 +23,17 @@ def main():
     p.add_argument("-o", "--output", default="model_manifest.json")
     args = p.parse_args()
 
-    # No sampling is needed merely to determine the feature set/count.
-    df = load_dataframe(args.file, k=args.k, samples=0, seed=args.seed)
+    # Build the manifest from the exact deterministic training sample, not the
+    # full dataframe. A feature can have values globally yet be entirely empty
+    # inside a sampled training subset; load_dataframe removes such columns.
+    # Using the same samples/seed here and in every partial job guarantees an
+    # identical feature list, feature order, and respondent subset.
+    df = load_dataframe(
+        args.file,
+        k=args.k,
+        samples=args.samples,
+        seed=args.seed,
+    )
     names = [str(x) for x in df.columns]
     n = len(names)
 
@@ -40,6 +49,7 @@ def main():
         "feature_count": n,
         "feature_names": names,
         "feature_names_sha256": feature_hash(names),
+        "training_row_count": len(df),
         "step": args.step,
         "model_dir": model_dir,
         "model_prefix": prefix_path,
@@ -60,6 +70,7 @@ def main():
         f.write("\n")
 
     print(f"Manifest: {args.output}")
+    print(f"Training rows: {len(df)}")
     print(f"Features: {n}")
     print(f"Chunks: {len(rs)}")
     for b, e in rs:
