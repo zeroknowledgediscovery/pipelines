@@ -15,9 +15,11 @@ import pandas as pd
 def load_dataframe(path: str, k: int = 1, samples: int = 0, seed: int = 42) -> pd.DataFrame:
     """Load the training CSV exactly the same way for every partial job.
 
-    The first CSV column is treated as the row index. Empty strings are kept,
-    literal "None" is converted to an empty string, and columns with fewer than
-    k unique non-empty values are removed.
+    The first CSV column is treated as the row index. Literal ``None`` values
+    are converted to empty strings. If ``samples`` is non-zero, the deterministic
+    training sample is selected *before* column filtering. Columns with fewer
+    than ``k`` unique non-empty values in the actual training sample are then
+    removed. This guarantees that an all-empty column cannot reach Qnet.fit().
     """
     df = (
         pd.read_csv(path, keep_default_na=False, index_col=0, low_memory=False)
@@ -25,12 +27,10 @@ def load_dataframe(path: str, k: int = 1, samples: int = 0, seed: int = 42) -> p
         .astype(str)
     )
 
-    keep_cols = [
-        c for c in df.columns
-        if df[c].replace("", np.nan).nunique(dropna=True) >= k
-    ]
-    df = df.loc[:, keep_cols]
-
+    # Select the exact training rows first. A column that has observations in the
+    # full dataset can still be completely empty in a sampled training subset.
+    # Filtering before sampling therefore allowed all-empty columns to reach
+    # Qnet.fit(). Every partial job uses the same seed, so it gets the same rows.
     if samples and samples > 0:
         if samples > len(df):
             raise ValueError(
@@ -38,8 +38,39 @@ def load_dataframe(path: str, k: int = 1, samples: int = 0, seed: int = 42) -> p
             )
         df = df.sample(n=samples, random_state=seed)
 
+    # Treat whitespace-only cells as empty without otherwise altering category
+    # labels. Then retain only columns with enough distinct non-empty values in
+    # the actual training dataframe.
+    for c in df.columns:
+        whitespace_only = df[c].str.strip().eq("")
+        if whitespace_only.any():
+            df.loc[whitespace_only, c] = ""
+
+    keep_cols = [
+        c for c in df.columns
+        if df[c].replace("", np.nan).nunique(dropna=True) >= k
+    ]
+    dropped_cols = [c for c in df.columns if c not in keep_cols]
+    if dropped_cols:
+        print(
+            f"Dropped {len(dropped_cols)} column(s) with fewer than {k} "
+            f"unique non-empty value(s): {dropped_cols[:20]}"
+            + (" ..." if len(dropped_cols) > 20 else "")
+        )
+    df = df.loc[:, keep_cols]
+
     if df.shape[1] == 0:
         raise ValueError("No columns remain after filtering")
+
+    # Defensive check: Qnet rejects any feature whose training values are all
+    # empty strings. This should be impossible after the filtering above.
+    all_empty = [c for c in df.columns if df[c].eq("").all()]
+    if all_empty:
+        raise RuntimeError(
+            "Internal preprocessing error: all-empty columns remain: "
+            + ", ".join(map(str, all_empty[:20]))
+        )
+
     return df
 
 
