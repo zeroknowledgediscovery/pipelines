@@ -10,6 +10,14 @@ The older Python/Quasinet partial-model pipeline is intentionally retained uncha
 - `run_manifest.sh` — prepare or submit one native-LSM job for every CSV listed in a manifest.
 - `examples/eurobarometer_remaining.sh` — run from the Eurobarometer data folder to identify CSVs without completed sibling LSM directories and optionally upload them to MCC with the `mcp` helper from `zeroknowledgediscovery/bash_utils`.
 
+## Get this branch
+
+```bash
+git fetch origin
+git switch native-lsm-slurm
+git pull --ff-only origin native-lsm-slurm
+```
+
 ## One dataset
 
 On the cluster:
@@ -17,7 +25,7 @@ On the cluster:
 ```bash
 export LSM_BIN=/path/to/lsm/bin/LSM
 
-./launch_native.sh \
+bash ./launch_native.sh \
   -d ZA3939_v1-0-1.csv \
   -c 120 \
   -a 0.1 \
@@ -63,7 +71,7 @@ Dropbox/ZED/Research/MAGICS_research/survey/data/eurobarometer
 run:
 
 ```bash
-/path/to/pipelines/native_lsm_slurm/examples/eurobarometer_remaining.sh
+bash /path/to/pipelines/native_lsm_slurm/examples/eurobarometer_remaining.sh
 ```
 
 This creates:
@@ -78,7 +86,7 @@ To also push every remaining CSV and the manifest to MCC:
 
 ```bash
 MCP_TARGET=/scratch/ich248/eurobarometer \
-  /path/to/pipelines/native_lsm_slurm/examples/eurobarometer_remaining.sh
+  bash /path/to/pipelines/native_lsm_slurm/examples/eurobarometer_remaining.sh
 ```
 
 The upload syntax comes from the `mcp` helper in the private `zeroknowledgediscovery/bash_utils` repository:
@@ -96,7 +104,7 @@ cd /scratch/ich248/eurobarometer
 
 export LSM_BIN=/path/to/lsm/bin/LSM
 
-/path/to/pipelines/native_lsm_slurm/run_manifest.sh \
+bash /path/to/pipelines/native_lsm_slurm/run_manifest.sh \
   -M remaining_eurobarometer.txt \
   -D . \
   -c 120 \
