@@ -82,7 +82,7 @@ while IFS= read -r entry || [[ -n "$entry" ]]; do
   out="$OUTPUT_ROOT/${base%.csv}"
 
   args=(
-    "$SCRIPT_DIR/launch_native.sh"
+    bash "$SCRIPT_DIR/launch_native.sh"
     -d "$csv"
     -o "$out"
     -x "$LSM_BIN"
