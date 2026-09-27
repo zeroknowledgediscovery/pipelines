@@ -86,7 +86,7 @@ fi
 
 mkdir -p "$(dirname "$OUTPUT")"
 
-tag="$(basename "$OUTPUT" | tr -cs 'A-Za-z0-9_.-' '_')"
+tag="$(printf '%s' "$(basename "$OUTPUT")" | tr -c 'A-Za-z0-9_.-' '_')"
 SBATCH_FILE="submit_native_${tag}.sbatch"
 
 printf -v Q_DATA '%q' "$DATAFRAME"
