@@ -9,7 +9,7 @@ CORES="${NUMCORES:-120}"
 ALPHA="${ALPHA:-0.1}"
 TIME="${TIME:-50:00:00}"
 MEMORY="${MEMORY:-500g}"
-PARTITION="${PARTITION:-normal}"
+PARTITION="${PARTITION:-short}"
 ACCOUNT="${ACCOUNT:-coa_ich248_uksr}"
 SUBMIT=false
 FORCE=false
@@ -26,7 +26,7 @@ Usage: run_manifest.sh -M manifest.txt [options]
   -a FLOAT     alpha (default: 0.1)
   -t TIME      Slurm time (default: 50:00:00)
   -m MEM       Slurm memory (default: 500g)
-  -p PART      partition (default: normal)
+  -p PART      partition (default: short)
   -A ACCOUNT   account (default: coa_ich248_uksr)
   -l           submit jobs; omit to only prepare sbatch files
   -F           force existing models
