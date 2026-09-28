@@ -8,7 +8,7 @@ DATAFRAME=""
 ALPHA="${ALPHA:-0.1}"
 OUTPUT=""
 LSM_BIN="${LSM_BIN:-}"
-PARTITION="${PARTITION:-normal}"
+PARTITION="${PARTITION:-short}"
 ACCOUNT="${ACCOUNT:-coa_ich248_uksr}"
 SUBSET_MODE="${LSM_SUBSET_MODE:-auto}"
 MAX_EXACT_LEVELS="${LSM_MAX_EXACT_LEVELS:-20}"
@@ -30,7 +30,7 @@ Options:
   -a FLOAT     alpha (default: 0.1)
   -t TIME      Slurm time (default: 50:00:00)
   -m MEM       Slurm memory (default: 500g)
-  -p PART      Slurm partition (default: normal)
+  -p PART      Slurm partition (default: short)
   -A ACCOUNT   Slurm account (default: coa_ich248_uksr)
   -l           submit with sbatch
   -F           force even if output/meta.txt already exists
