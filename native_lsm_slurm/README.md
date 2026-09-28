@@ -40,7 +40,7 @@ Defaults follow the MCC setup used in the older launch utilities:
 threads:   120
 time:      50:00:00
 memory:    500g
-partition: normal
+partition: short
 account:   coa_ich248_uksr
 ```
 
